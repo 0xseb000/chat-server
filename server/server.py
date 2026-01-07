@@ -5,7 +5,7 @@ from threading import Thread
 class Server:
 
     def __init__(self, host, port):
-        # Räume: Jeder Raum hat eine eigene Liste von Clients
+        # Jeder Raum hat eine eigene Liste von Clients
         # Ein Client wird durch seinen Socket repräsentiert
         self.rooms = {
             "main": [],
@@ -18,8 +18,8 @@ class Server:
 
         # Server Socket vorbereiten, hier entsteht der Haupteingang
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.bind((host, port))   # Adresse + Port reservieren
-        self.sock.listen()             # Server in "Wartemodus" versetzen
+        self.sock.bind((host, port))   # Adresse und Port reservieren
+        self.sock.listen()             # Server in Wartemodus/Hörmodus versetzen
 
         print(f"\033[31mServer:\033[0m startet at {host}:{port}")
         print("Verfügbare Räume: main, lounge, coffee-break")
@@ -28,7 +28,7 @@ class Server:
         # Durch daemon blockiert accept() nicht den Hauptthread
         Thread(target=self.accept_clients, daemon=True).start()
 
-        # Der Hauptthread bleibt für Server Eingaben reserviert (Admin)
+        # Der Hauptthread bleibt für Server Eingaben reserviert (admin)
         self.handle_console()
 
 
@@ -36,12 +36,11 @@ class Server:
         # Diese Schleife läuft dauerhaft und wartet auf neue Verbindungen
         while True:
             # Sobald sich ein Client verbindet, erzeugt accept()
-            # einen neuen Socket NUR für diese Verbindung
+            # einen neuen Socket nur für diese Verbindung
             client_conn, addr = self.sock.accept()
             print(f"\033[32mNeuer Client verbunden:\033[0m {addr}")
 
-            # Für jeden Client wird ein eigener Thread gestartet.
-            # Dadurch können mehrere Clients gleichzeitig chatten.
+            # Für jeden Client wird ein eigener Thread gestartet, mit daemon damit er nicht den Hauptthread blockiert
             Thread(
                 target=self.handle_client,
                 args=(client_conn, addr),
@@ -75,7 +74,7 @@ class Server:
         # Info für den Client selbst
         client_conn.sendall(
             f"Du bist jetzt in '{room_choice}'. "
-            f"Mit '/cd name-des-raums' kannst du den Raum wechseln.\n".encode()
+            f"Mit '/cd <raumname>' kannst du den Raum wechseln.\n".encode()
         )
 
         # Alle anderen im Raum erfahren, dass jemand beigetreten ist
@@ -90,7 +89,7 @@ class Server:
             # Warten auf nächste Nachricht vom Client
             data = client_conn.recv(1024)
 
-            # Wenn nichts mehr kommt → Verbindung wurde geschlossen
+            # Wenn nichts mehr kommt, Verbindung wurde geschlossen
             if not data:
                 break
 
@@ -219,6 +218,6 @@ class Server:
                 self.broadcast(room_name, f"Server: {server_message}")
 
 
-# Einstiegspunkt — hier startet der Server
+# Server starten
 Server('127.0.0.1', 8080)
 
