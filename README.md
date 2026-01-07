@@ -26,6 +26,12 @@ gleichzeitig schreiben, empfangen und die Räume wechseln können.
 
 ---
 
+## Voraussetzungen
+
+Python 3.x und freie Port-Verbindung auf 127.0.0.1:8080
+
+---
+
 ## Verwendung
 In das Verzeichnis des Projekts wechseln.
 
@@ -34,8 +40,6 @@ Der Server startet und wartet auf eingehende Verbindungen.
 
     python3 ./server/server.py
 
-
----
 
 ### Einen oder mehrere Clients starten
 Für jeden Client ein eigenes Terminalfenster öffnen und folgende Befehle eingeben:
